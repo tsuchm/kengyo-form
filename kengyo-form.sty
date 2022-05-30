@@ -1,0 +1,147 @@
+\setlength{\topmargin}{-14mm}
+\setlength{\textheight}{273mm}
+\setlength{\textwidth}{179mm}
+\setlength{\oddsidemargin}{-2.7mm}
+
+\newcommand{\employer}[1]{%
+  \def\ken@employer{#1}
+}
+\newcommand{\position}[1]{%
+  \def\ken@position{#1}
+}
+\newcommand{\address}[1]{%
+  \def\ken@address{#1}
+}
+\newcommand{\term}[2]{%
+  \def\ken@begin@term{#1}
+  \def\ken@end@term{#2}
+}
+\newcommand{\reward}[0]{%
+  \def\ken@rewardmark{\circle{5}}
+  \def\ken@norewardmark{}
+}
+\newcommand{\noreward}[0]{%
+  \def\ken@rewardmark{}
+  \def\ken@norewardmark{\circle{5}}
+}
+\newcommand{\workatuniversity}[0]{%
+  \def\ken@workatuniversitymark{\checkmark}
+  \def\ken@workatothermark{}
+  \def\ken@workcontent{}
+}
+\newcommand{\workatother}[1]{%
+  \def\ken@workatuniversitymark{}
+  \def\ken@workatothermark{\checkmark}
+  \def\ken@workcontent{#1}
+}
+
+\newdimen\ken@base@x
+\newdimen\ken@base@y
+\newdimen\ken@temp@x
+\newdimen\ken@temp@y
+\def\ken@setbase(#1,#2){%
+  \ken@base@x=#1pt
+  \ken@base@y=#2pt
+}
+{\catcode`\p=12\catcode`\t=12\gdef\ken@num#1pt{#1}}
+\def\ken@put(#1,#2)#3{
+  \ken@temp@x=#1pt
+  \advance\ken@temp@x by \ken@base@x
+  \def\ken@pos@x{\expandafter\ken@num\the\ken@temp@x}
+  \ken@temp@y=#2pt
+  \advance\ken@temp@y by \ken@base@y
+  \def\ken@pos@y{\expandafter\ken@num\the\ken@temp@y}
+  \put(\ken@pos@x,\ken@pos@y){#3}
+}
+\def\ken@putparbox(#1,#2)#3#4{%
+  \def\@parwidth{#3}
+  \setbox0=\hbox{#4}
+  \ifdim\wd0>\@parwidth
+    \ken@put(#1,#2){\parbox[c]{\@parwidth}{\footnotesize{}#4}}
+  \else
+    \ken@put(#1,#2){#4}
+  \fi
+}
+
+\newcommand{\ken@writeentry}[1]{
+  \ken@setbase(0,#1)
+  % 兼業日時
+  \ken@put(6,25){\ken@date}
+  \ken@put(19.5,17.5){\ken@dayofweek}
+  % 兼業従事時間
+  \ken@put(38,20){\ken@opentime}
+  \ken@put(38,10){\ken@closetime}
+  % 報酬の有無
+  \ken@put(7.8,0){\ken@rewardmark}
+  \ken@put(19,0){\ken@norewardmark}
+  % 大学へ出勤するチェックマーク
+  \ken@put(64,30){\ken@workatuniversitymark}
+  % 大学へ出勤しないチェックマーク
+  \ken@put(63,17.5){\ken@workatothermark}
+  % 兼業の従事場所と同じチェックマーク
+  \ken@put(96.5,12.5){\ken@workatothermark}
+  % 研修内容
+  \ken@putparbox(96.5,24){35mm}{\ken@workcontent}
+  % 資料収集のチェックマーク
+  \ken@put(147,18.5){\ken@workatothermark}
+}
+
+\def\ken@firstentry{}
+\def\ken@secondentry{}
+\def\ken@thirdentry{}
+\newcommand{\entry}[4]{%
+  \ifx\ken@firstentry\empty
+    \def\ken@firstentry{%
+      \def\ken@date{#1}
+      \def\ken@dayofweek{#2}
+      \def\ken@opentime{#3}
+      \def\ken@closetime{#4}
+      \ken@writeentry{136}}
+  \else
+  \ifx\ken@secondentry\empty
+    \def\ken@secondentry{%
+      \def\ken@date{#1}
+      \def\ken@dayofweek{#2}
+      \def\ken@opentime{#3}
+      \def\ken@closetime{#4}
+      \ken@writeentry{98.25}}
+  \else
+    \def\ken@thirdentry{%
+      \def\ken@date{#1}
+      \def\ken@dayofweek{#2}
+      \def\ken@opentime{#3}
+      \def\ken@closetime{#4}
+      \ken@writeentry{60.5}}
+  \fi
+  \fi
+}
+
+\def\ken@writeform{%
+  \CenterWallPaper{0.85}{wallpaper.eps}
+  \unitlength=1mm
+  \begin{picture}(179,272.3)
+    % \put(0,272){\circle*{1}}
+    % \put(90,272){\circle*{1}}
+    % \put(178,272){\circle*{1}}
+    % \put(178,0){\circle*{1}}
+    % \put(0,0){\circle*{1}}
+    % 兼業先
+    \ken@setbase(0,0)
+    \ken@putparbox(31,207.5){62mm}{\ken@employer}
+    % 兼業先での役職
+    \ken@putparbox(31,197.5){62mm}{\ken@position}
+    % 兼業従事場所
+    \ken@put(31,187.5){\ken@address}
+    % 許可兼業チェックマーク
+    \ken@put(101.5,209){\checkmark}
+    % 兼業任期
+    \ken@put(129,207.5){\ken@begin@term}
+    \ken@put(129,197.5){\ken@end@term}
+    \ken@firstentry{}
+    \ken@secondentry{}
+    \ken@thirdentry{}
+  \end{picture}}
+
+\pagestyle{empty}
+\let\orig@enddocument=\enddocument
+\def\enddocument{\ken@writeform\orig@enddocument}
